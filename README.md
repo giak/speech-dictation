@@ -144,6 +144,8 @@ source venv/bin/activate
 
 ## Commandes Vocales Disponibles
 
+### Ponctuation et Formatage
+
 Le script reconnaît les commandes suivantes :
 
 - "virgule" → ,
@@ -157,6 +159,49 @@ Le script reconnaît les commandes suivantes :
 - "fermer parenthèse" → )
 - "guillemets" → "
 - "espace" → espace
+
+### Commandes de Contrôle
+
+Commandes pour contrôler la dictée :
+
+- "pause dictée" → Met en pause la reconnaissance vocale
+- "reprendre dictée" → Reprend la reconnaissance après une pause
+- "arrêter dictée" → Arrête proprement le programme
+- "effacer" → Efface le dernier caractère (comme la touche retour arrière)
+- "supprimer ligne" → Efface la ligne courante
+
+## Fonctionnalités
+
+### Retours Sonores
+
+Le programme fournit maintenant des retours sonores pour les actions importantes :
+
+- Son de démarrage quand la dictée commence
+- Son d'arrêt quand la dictée est mise en pause ou arrêtée
+- Son d'erreur en cas de problème
+
+### Gestion des Erreurs
+
+- Gestion robuste des erreurs audio
+- Arrêt propre en cas d'interruption (Ctrl+C)
+- Feedback visuel et sonore en cas de problème
+- Timeout sur la capture audio pour éviter les blocages
+
+### Mode Pause
+
+Vous pouvez maintenant :
+
+1. Mettre la dictée en pause avec la commande "pause dictée"
+2. Parler sans que le texte soit transcrit
+3. Reprendre la dictée avec "reprendre dictée"
+
+### Contrôle du Texte
+
+Nouvelles fonctionnalités de contrôle :
+
+- Effacement caractère par caractère
+- Suppression de ligne entière
+- Mémorisation du dernier texte dicté
 
 ## Fonctionnalités Avancées
 
@@ -234,6 +279,34 @@ Si la reconnaissance est lente ou imprécise :
    - Vérifiez la charge CPU
    - Ajustez la taille du buffer audio
    - Utilisez un modèle plus léger si nécessaire
+
+## Configuration Avancée
+
+Le script utilise maintenant un dictionnaire de configuration `CONFIG` qui permet de personnaliser :
+
+```python
+CONFIG = {
+    "samplerate": 16000,      # Taux d'échantillonnage audio
+    "blocksize": 8000,        # Taille des blocs audio
+    "model_path": "~/vosk-model-fr-0.6-linto-2.2.0",  # Chemin du modèle
+    "feedback_sounds": {       # Sons de feedback
+        "start": "/usr/share/sounds/freedesktop/stereo/service-login.oga",
+        "stop": "/usr/share/sounds/freedesktop/stereo/service-logout.oga",
+        "error": "/usr/share/sounds/freedesktop/stereo/dialog-error.oga"
+    }
+}
+```
+
+Vous pouvez modifier ces valeurs selon vos besoins en éditant le fichier `dictation.py`.
+
+## Arrêt Propre
+
+Le programme peut maintenant être arrêté de plusieurs façons :
+
+- En utilisant la commande vocale "arrêter dictée"
+- En appuyant sur Ctrl+C
+- En envoyant un signal SIGTERM
+- En utilisant la commande "pause dictée" puis Ctrl+C
 
 ## Limitations Connues
 
