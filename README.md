@@ -2,6 +2,18 @@
 
 Un outil de dictée vocale en français pour Linux, utilisant Vosk pour la reconnaissance vocale et xdotool pour la simulation de frappe clavier.
 
+## À propos de Vosk
+
+[Vosk](https://alphacephei.com/vosk/) est un toolkit de reconnaissance vocale open source qui offre plusieurs avantages :
+
+- Fonctionne entièrement hors-ligne
+- Supporte plus de 20 langues et dialectes
+- Modèles légers (environ 50Mo)
+- API de streaming pour une réponse en temps réel
+- Vocabulaire reconfigurable
+- Identification du locuteur
+- Parfait pour les chatbots, assistants virtuels et transcriptions
+
 ## Prérequis Système
 
 Le script a été testé sous Linux Mint 22 et devrait fonctionner sur les distributions Ubuntu-based similaires.
@@ -74,6 +86,27 @@ pip3 install vosk sounddevice
 python3 dictation.py
 ```
 
+## Installation du Modèle Français
+
+Le modèle français doit être téléchargé séparément :
+
+```bash
+# Créer le dossier pour le modèle
+cd ~
+
+# Télécharger le modèle français
+wget https://github.com/LinTO-ai/model-vosk-fr-0.6-linto-2.2.0/archive/refs/heads/main.zip
+
+# Décompresser le modèle
+unzip main.zip
+
+# Renommer le dossier pour correspondre au chemin dans le script
+mv model-vosk-fr-0.6-linto-2.2.0-main vosk-model-fr-0.6-linto-2.2.0
+
+# Nettoyer
+rm main.zip
+```
+
 ## Configuration du Microphone
 
 1. Vérifiez que votre microphone est bien détecté :
@@ -125,6 +158,34 @@ Le script reconnaît les commandes suivantes :
 - "guillemets" → "
 - "espace" → espace
 
+## Fonctionnalités Avancées
+
+### Adaptation du Modèle
+
+Vosk permet d'adapter le modèle de reconnaissance pour améliorer la précision :
+
+- Ajout de vocabulaire spécifique
+- Adaptation au locuteur
+- Personnalisation du modèle de langage
+
+### Performance et Optimisation
+
+Pour obtenir les meilleures performances :
+
+1. Utilisez un microphone de bonne qualité
+2. Placez le microphone près de la source sonore
+3. Minimisez les bruits de fond
+4. Considérez utiliser un modèle plus grand pour plus de précision
+
+## Communauté et Support
+
+Pour obtenir de l'aide ou contribuer :
+
+- [Discord Vosk](https://discord.gg/kknE9jjVj6)
+- [Groupe Telegram](https://t.me/speech_recognition)
+- [Reddit](https://www.reddit.com/r/speechtech)
+- [Issues GitHub](https://github.com/alphacep/vosk-api/issues)
+
 ## Dépannage
 
 ### Problèmes de Microphone
@@ -161,16 +222,33 @@ Si la reconnaissance est lente ou imprécise :
 2. Parlez clairement et à un rythme modéré
 3. Vérifiez que votre CPU n'est pas surchargé
 
+### Problèmes Courants
+
+1. **Erreur de reconnaissance** :
+
+   - Vérifiez la qualité audio avec `arecord`
+   - Testez différents paramètres de microphone
+   - Essayez un modèle plus grand
+
+2. **Latence** :
+   - Vérifiez la charge CPU
+   - Ajustez la taille du buffer audio
+   - Utilisez un modèle plus léger si nécessaire
+
 ## Limitations Connues
 
 - La reconnaissance vocale nécessite une connexion internet pour le téléchargement initial du modèle, mais fonctionne hors-ligne ensuite
 - Les performances dépendent de la qualité du microphone et de l'environnement sonore
 - Le modèle français peut avoir des difficultés avec certains accents ou expressions régionales
 
-## Support
+## Références
 
-Pour signaler un bug ou suggérer une amélioration, veuillez ouvrir une issue sur le dépôt GitHub.
+- [Documentation officielle Vosk](https://alphacephei.com/vosk/)
+- [Modèles disponibles](https://alphacephei.com/vosk/models)
+- [Guide d'adaptation](https://alphacephei.com/vosk/adaptation)
 
 ## Licence
 
 Ce projet est sous licence MIT. Voir le fichier LICENSE pour plus de détails.
+
+Les modèles Vosk sont sous [licence Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0).
