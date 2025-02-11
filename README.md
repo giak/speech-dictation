@@ -37,14 +37,20 @@ source ~/.bashrc  # ou source ~/.zshrc si vous utilisez zsh
 sudo apt install xdotool libportaudio2 python3-full
 
 # Installation des paquets Python via pipx
-pipx install vosk
-pipx install sounddevice
+source .venv/bin/activate && pip install vosk
+python3 -m venv .venv && source .venv/bin/activate && pip install sounddevice
+source .venv/bin/activate && pip install numpy
 
 # Création du dossier scripts et installation du script
 mkdir -p ~/scripts
 cd ~/scripts
 # Copiez le fichier dictation.py dans ce dossier
 chmod +x dictation.py
+
+# Activation de l'environnement virtuel
+source .venv/bin/activate
+# Exécution du script
+python3 dictation.py
 ```
 
 ### Méthode 2 : Installation avec environnement virtuel
@@ -64,7 +70,7 @@ source .venv/bin/activate
 pip install --upgrade pip setuptools
 
 # Installation des dépendances Python
-pip install vosk sounddevice
+pip install vosk sounddevice numpy
 
 # Exécution du script
 python dictation.py
@@ -80,7 +86,7 @@ sudo apt update
 sudo apt install xdotool libportaudio2 python3-full python3-pip
 
 # Installation des dépendances Python
-pip3 install vosk sounddevice
+pip3 install vosk sounddevice numpy
 
 # Exécution du script
 python3 dictation.py
@@ -205,22 +211,74 @@ Nouvelles fonctionnalités de contrôle :
 
 ## Fonctionnalités Avancées
 
-### Adaptation du Modèle
+### Optimisation de la Reconnaissance Vocale
 
-Vosk permet d'adapter le modèle de reconnaissance pour améliorer la précision :
+Le système intègre maintenant des fonctionnalités avancées pour améliorer la qualité de la reconnaissance :
 
-- Ajout de vocabulaire spécifique
-- Adaptation au locuteur
-- Personnalisation du modèle de langage
+- Détection d'activité vocale (VAD) avec seuil dynamique
+- Réduction de bruit intelligente
+- Gestion optimisée du buffer audio
+- Seuil de confiance configurable pour les résultats
+- Adaptation dynamique à l'environnement sonore
 
-### Performance et Optimisation
+### Post-traitement Intelligent
+
+Le texte reconnu bénéficie d'un traitement sophistiqué :
+
+- Suppression automatique des mots parasites (euh, hum, etc.)
+- Correction intelligente de la capitalisation
+- Formatage automatique des nombres
+- Gestion avancée de la ponctuation française
+- Correction contextuelle basée sur la grammaire
+
+### Configuration Avancée
+
+Le script propose une configuration fine via deux dictionnaires principaux :
+
+```python
+CONFIG = {
+    "samplerate": 16000,      # Taux d'échantillonnage standard
+    "blocksize": 8000,        # Taille des blocs audio
+    "model_path": "~/vosk-model-fr-0.6-linto-2.2.0",
+    "feedback_sounds": {       # Sons de feedback configurables
+        "start": "/usr/share/sounds/freedesktop/stereo/service-login.oga",
+        "stop": "/usr/share/sounds/freedesktop/stereo/service-logout.oga",
+        "error": "/usr/share/sounds/freedesktop/stereo/dialog-error.oga"
+    }
+}
+
+MODEL_CONFIG = {
+    "sample_rate": 16000,     # Doit correspondre à CONFIG["samplerate"]
+    "buffer_size": 8000,      # Taille du buffer pour le traitement
+    "words": True,            # Sortie mot par mot
+    "max_alternatives": 1,    # Alternatives de reconnaissance
+    "score_cutoff": 0.75,     # Seuil de confiance minimum
+    "partial_results": False, # Désactive les résultats partiels
+    "context_size": 5,       # Taille du contexte
+    "noise_reduction": True,  # Réduction de bruit
+    "vad_sensitivity": 3,    # Sensibilité VAD (0-3)
+    "silence_threshold": 200  # Seuil de silence (ms)
+}
+```
+
+### Optimisation des Performances
 
 Pour obtenir les meilleures performances :
 
-1. Utilisez un microphone de bonne qualité
-2. Placez le microphone près de la source sonore
-3. Minimisez les bruits de fond
-4. Considérez utiliser un modèle plus grand pour plus de précision
+1. Ajustez les paramètres VAD selon votre environnement
+2. Configurez le seuil de confiance (`score_cutoff`)
+3. Adaptez la taille du buffer selon votre CPU
+4. Réglez la sensibilité de détection vocale
+5. Optimisez le seuil de silence selon vos besoins
+
+### Gestion du Contexte
+
+Le système maintient un contexte linguistique pour améliorer la reconnaissance :
+
+- Historique des derniers mots reconnus
+- Correction contextuelle des verbes
+- Gestion des accords en genre et nombre
+- Adaptation dynamique aux phrases précédentes
 
 ## Communauté et Support
 
@@ -280,25 +338,6 @@ Si la reconnaissance est lente ou imprécise :
    - Ajustez la taille du buffer audio
    - Utilisez un modèle plus léger si nécessaire
 
-## Configuration Avancée
-
-Le script utilise maintenant un dictionnaire de configuration `CONFIG` qui permet de personnaliser :
-
-```python
-CONFIG = {
-    "samplerate": 16000,      # Taux d'échantillonnage audio
-    "blocksize": 8000,        # Taille des blocs audio
-    "model_path": "~/vosk-model-fr-0.6-linto-2.2.0",  # Chemin du modèle
-    "feedback_sounds": {       # Sons de feedback
-        "start": "/usr/share/sounds/freedesktop/stereo/service-login.oga",
-        "stop": "/usr/share/sounds/freedesktop/stereo/service-logout.oga",
-        "error": "/usr/share/sounds/freedesktop/stereo/dialog-error.oga"
-    }
-}
-```
-
-Vous pouvez modifier ces valeurs selon vos besoins en éditant le fichier `dictation.py`.
-
 ## Arrêt Propre
 
 Le programme peut maintenant être arrêté de plusieurs façons :
@@ -325,3 +364,73 @@ Le programme peut maintenant être arrêté de plusieurs façons :
 Ce projet est sous licence MIT. Voir le fichier LICENSE pour plus de détails.
 
 Les modèles Vosk sont sous [licence Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+
+## Tests Unitaires
+
+Le projet inclut maintenant une suite de tests unitaires pour assurer la qualité et la fiabilité du code.
+
+### Exécution des Tests
+
+Pour exécuter les tests :
+
+```bash
+# Tests unitaires standards
+python3 -m unittest test_dictation.py -v
+
+# Tests de performance
+python3 -m unittest test_performance.py -v
+
+# Tests de performance avec profilage mémoire détaillé
+PROFILE_MEMORY=1 python3 -m memory_profiler test_performance.py
+
+# Tests de performance avec profilage CPU
+python3 -m cProfile -s cumulative test_performance.py
+```
+
+Les tests de performance fournissent des métriques détaillées sur :
+
+- L'utilisation de la mémoire
+- Les temps d'exécution
+- L'utilisation CPU
+- La latence de traitement
+- La performance sous charge
+
+Chaque test affiche ses métriques de performance, et le profilage mémoire montre l'évolution de l'utilisation mémoire ligne par ligne.
+
+### Couverture des Tests
+
+Les tests couvrent les fonctionnalités principales :
+
+- Traitement des commandes vocales
+- Post-traitement du texte
+- Détection d'activité vocale
+- Gestion du contexte
+- Correction grammaticale
+- Formatage des nombres
+- Gestion des commandes système
+
+### Ajout de Nouveaux Tests
+
+Pour ajouter de nouveaux tests :
+
+1. Ouvrez `test_dictation.py`
+2. Ajoutez une nouvelle méthode de test dans la classe `TestDictationEngine`
+3. Le nom de la méthode doit commencer par `test_`
+4. Utilisez les assertions de `unittest` pour vérifier les résultats
+
+Exemple :
+
+```python
+def test_ma_nouvelle_fonction(self):
+    """Description du test"""
+    resultat = self.engine.ma_fonction("test")
+    self.assertEqual(resultat, "résultat attendu")
+```
+
+### Bonnes Pratiques
+
+- Chaque test doit être indépendant
+- Utilisez `setUp()` pour la configuration commune
+- Documentez chaque test avec un docstring
+- Utilisez des mocks pour les dépendances externes
+- Testez les cas limites et les erreurs
